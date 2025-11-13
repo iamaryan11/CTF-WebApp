@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-// Import the new thunk for clearing state if needed, but not strictly necessary here.
+
 import { registerUser } from "../authSlice"; 
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import Loader from "../components/Loader"; // Retained, though not used in the provided snippet
+import Loader from "../components/Loader"; 
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -14,24 +14,19 @@ const RegisterPage = () => {
     password: "",
   });
 
-  // This state is now crucial for showing the server's success message
+
   const [successMessage, setSuccessMessage] = useState(null);
 
   const { user_name, email_id, phone, password } = formData;
 
-  // isAuthenticated is no longer relevant for the redirect after *registration*
+
   const { loading, error } = useSelector( 
     (state) => state.auth
   );
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // 1. REMOVE: The isAuthenticated check is removed
-  // useEffect(() => {
-  //   if (isAuthenticated) {
-  //     // navigate('/verifyemail');
-  //   }
-  // }, [isAuthenticated, navigate]);
+ 
 
   const handleChange = (e) => {
     setFormData({
@@ -46,25 +41,25 @@ const RegisterPage = () => {
 
     if (user_name && email_id && password && !loading) {
       try {
-        // Dispatch the registration thunk
+
         const resultAction = await dispatch(registerUser(formData)).unwrap();
         
-        // 2. CHANGE: Use the message returned from the backend (or a default one)
+
         setSuccessMessage(
-          // Assuming backend returns { message: "..." } on success
+
           resultAction.message || "Registration successful! Please check your email for the OTP, Check you spam too, as this is a free tier :)."
         );
         
-        // Redirect to the verification page after a short delay
+
         setTimeout(() => {
           navigate("/verifyemail", { 
-            // Pass the email_id to pre-fill the verification form
+
             state: { email_id: formData.email_id } 
           });
         }, 1500); 
 
       } catch (err) {
-        // Error handling is already good, just ensure a message is displayed if the error is caught here
+
         console.error("Registration failed:", err);
       }
     }
