@@ -99,7 +99,7 @@ export default function ChallengeDetailPage() {
   useEffect(() => {
     const fetchChallenge = async () => {
       try {
-        const res = await axios.get(`http://localhost:1111/api/${id}`, {
+        const res = await axios.get(`https://ctf-webapp-w65c.onrender.com/api/${id}`, {
           withCredentials: true,
         });
         setQuestion(res.data);
@@ -124,7 +124,7 @@ export default function ChallengeDetailPage() {
 
     try {
       const res = await axios.post(
-        "http://localhost:1111/api/submit-flag",
+        "https://ctf-webapp-w65c.onrender.com/api/submit-flag",
         { questionId: id, submittedFlag: flag },
         { withCredentials: true }
       );
@@ -173,7 +173,7 @@ export default function ChallengeDetailPage() {
       setMessage("Requesting the hint from President Sahab for you");
 
       const res = await axios.post(
-        "http://localhost:1111/user/request-hint",
+        "https://ctf-webapp-w65c.onrender.com/user/request-hint",
         { questionId: id },
         { withCredentials: true }
       );
