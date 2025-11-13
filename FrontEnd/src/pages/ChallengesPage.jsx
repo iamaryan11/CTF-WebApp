@@ -16,7 +16,7 @@ const ChallengesPage = () => {
   useEffect(() => {
     const fetchChallenges = async () => {
       try {
-        const res = await axios.get("http://localhost:1111/user/allquestions", {
+        const res = await axios.get("https://ctf-webapp-w65c.onrender.com/user/allquestions", {
           withCredentials: true,
         });
         setChallenges(res.data.questions);
