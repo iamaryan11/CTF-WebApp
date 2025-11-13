@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: "http://localhost:1111",
+  baseURL: "https://ctf-webapp-w65c.onrender.com",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
