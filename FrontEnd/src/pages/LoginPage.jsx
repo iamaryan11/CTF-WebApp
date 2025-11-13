@@ -17,19 +17,14 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // ------------------------------------------------------------------
-  // CRITICAL CHANGE: Handle redirect for unverified email error
-  // ------------------------------------------------------------------
   useEffect(() => {
     if (isAuthenticated) {
       playSuccess();
       navigate("/dashboard");
     }
 
-    // Check if the error is present and contains the specific unverified message
-    // Your backend sends: "Please verify your email before logging in."
     if (error && error.message && error.message.includes("verify your email")) {
-      // Redirect the user to the verification page
+
       navigate("/verifyemail", { state: { email_id } });
     }
   }, [isAuthenticated, navigate, error, email_id, playSuccess]);
@@ -37,7 +32,7 @@ const LoginPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (email_id && password && !loading) {
-      // The error handling for unverified status occurs after the thunk fails
+
       dispatch(loginUser({ email_id, password }));
     }
   };
@@ -124,7 +119,7 @@ const LoginPage = () => {
                    11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              {/* Displaying error.message or the error object itself if message is missing/unstructured */}
+
               <span className="wrap-break-words">{error.message || error}</span> 
             </motion.div>
           )}
