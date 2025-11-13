@@ -1,20 +1,17 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosClient from "./utils/axiosClient";
 
-// ----------------------------------------------------------------------
-// NEW THUNKS
-// ----------------------------------------------------------------------
 
 export const verifyOtp = createAsyncThunk(
   "auth/verifyOtp",
   async (verificationData, { rejectWithValue }) => {
     try {
-      // Calls the new backend endpoint for OTP verification
+
       const response = await axiosClient.post(
         "/user/verify-otp",
         verificationData
       );
-      // Backend returns user data and token on successful verification/login
+
       return response.data; 
     } catch (error) {
       return rejectWithValue({
@@ -27,9 +24,9 @@ export const verifyOtp = createAsyncThunk(
 );
 
 
-// ----------------------------------------------------------------------
-// EXISTING THUNKS (NO CHANGES REQUIRED)
-// ----------------------------------------------------------------------
+
+
+
 
 export const adminRegister = createAsyncThunk(
   "auth/adminRegister",
@@ -89,8 +86,7 @@ export const registerUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await axiosClient.post("/user/signup", userData);
-      // Returning response.data.user might be incorrect if the backend returns {message, userId}
-      // Ensure your backend returns {message, userId} and update this to return response.data
+
       return response.data; 
     } catch (error) {
       return rejectWithValue({
@@ -163,7 +159,7 @@ const authSlice = createSlice({
     resetPasswordMessage: null,
     adminRegisterMessage: null,
     
-    // NEW: State for OTP verification
+
     isVerificationPending: false, 
     verificationSuccess: false,   
     verificationMessage: null,    
@@ -184,7 +180,7 @@ const authSlice = createSlice({
       state.error = null;
     },
     
-    // NEW: Reducer to clear OTP verification state
+
     clearVerificationState: (state) => {
         state.verificationSuccess = false;
         state.verificationMessage = null;
@@ -193,10 +189,8 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-    
-      // ----------------------------------
-      // NEW: OTP Verification Reducers
-      // ----------------------------------
+  
+
       .addCase(verifyOtp.pending, (state) => {
         state.isVerificationPending = true;
         state.error = null;
@@ -205,8 +199,8 @@ const authSlice = createSlice({
       })
       .addCase(verifyOtp.fulfilled, (state, action) => {
         state.isVerificationPending = false;
-        state.isAuthenticated = true; // User is verified and logged in
-        state.user = action.payload.user; // Update user state with logged-in user data
+        state.isAuthenticated = true; 
+        state.user = action.payload.user; 
         state.verificationSuccess = true;
         state.verificationMessage = action.payload.message;
         state.error = null;
@@ -220,9 +214,7 @@ const authSlice = createSlice({
         state.error = action.payload?.message || "OTP verification failed.";
       })
       
-      // ----------------------------------
-      // EXISTING REDUCERS
-      // ----------------------------------
+  
 
       .addCase(adminRegister.pending, (state) => {
         state.loading = true;
@@ -246,7 +238,7 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        // User is registered but NOT authenticated until OTP is verified
+
         state.isAuthenticated = false; 
         state.user = null; 
       })
@@ -346,7 +338,7 @@ export const {
   clearAuthError,
   clearPasswordMessages,
   clearAdminRegisterMessage,
-  clearVerificationState, // Exporting the new reducer
+  clearVerificationState, 
 } = authSlice.actions;
 
 export default authSlice.reducer;
