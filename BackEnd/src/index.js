@@ -21,7 +21,7 @@ const eventTimerRoute = require("./routes/eventTimerRoute");
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://ctf-platform-u42u.onrender.com",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "UPDATE"],
     credentials: true,
   })
