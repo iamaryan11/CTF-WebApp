@@ -75,8 +75,8 @@ const verifyOtp = async (req, res) => {
     //     }
 
     user.isVerified = true;
-    user.otp = undefined;
-    user.otpExpiry = undefined;
+    user.otp = null;
+    user.otpExpiry = null;
     await user.save();
 
 
@@ -118,7 +118,7 @@ const resendOtp = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (user.verified) {
+    if (user.isVerified) {
       return res.status(400).json({ message: "User already verified" });
     }
     // i have commented the below line

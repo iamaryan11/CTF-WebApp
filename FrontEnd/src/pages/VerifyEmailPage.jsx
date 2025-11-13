@@ -1,43 +1,105 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux"; // 1. IMPORT REDUX HOOKS
+import { useNavigate, useLocation } from "react-router-dom"; // 2. IMPORT useLocation
+import { verifyOtp, clearVerificationState } from "../authSlice"; // 3. IMPORT THE THUNK AND CLEAR REDUCER
 import Loader from "../components/Loader";
 
 const VerifyEmailPage = () => {
-  const [email_id, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null);
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const location = useLocation(); // Get location state
+
+  // Get email_id passed from RegisterPage, if available
+  const initialEmail = location.state?.email_id || "";
+
+  // 4. USE REDUX STATE for loading, error, and messages
+  const {
+    isVerificationPending: loading, // Use the specific loading state
+    error,
+    verificationMessage,
+    verificationSuccess,
+    isAuthenticated,
+  } = useSelector((state) => state.auth);
+
+  const [formData, setFormData] = useState({
+    email_id: initialEmail,
+    otp: "",
+  });
+
+  const { email_id, otp } = formData;
+
+  // 5. useEffect to clear state on mount and handle success/redirect
+  useEffect(() => {
+    // Clear any previous verification messages/errors when mounting
+    dispatch(clearVerificationState());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (verificationSuccess && isAuthenticated) {
+        // Verification was successful and user is logged in (as per backend response)
+        setTimeout(() => {
+            navigate("/dashboard"); // Redirect to the main authenticated area
+        }, 1500);
+    }
+    // If the error property is set by the thunk, the UI will display it automatically.
+    // Ensure that if the user somehow navigates here while already authenticated
+    if (isAuthenticated && !verificationSuccess) {
+      // Small defensive check
+      // navigate("/dashboard"); 
+    }
+  }, [verificationSuccess, isAuthenticated, navigate]);
+
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleVerify = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setMessage(null);
-    setError(null);
+    if (!email_id || !otp || loading) return;
+
+    // Clear previous error messages before dispatching
+    dispatch(clearVerificationState()); 
 
     try {
-      const res = await fetch(`http://localhost:1111/user/verify-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email_id, otp }),
-        credentials: "include",
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setMessage(data.message || "Email verified successfully!");
-        setTimeout(() => navigate("/login"), 1000);
-      } else {
-        setError(data.message || "Verification failed");
-      }
+        // 6. USE REDUX THUNK INSTEAD OF fetch()
+        await dispatch(verifyOtp(formData)).unwrap();
+        // Success handled by the useEffect watching verificationSuccess
     } catch (err) {
-      setError("Server error. Please try again later.");
-    } finally {
-      setLoading(false);
+        // Errors handled by the Redux state ('error')
+        console.error("OTP verification failed:", err);
     }
   };
+
+  // 7. Update the Alert logic to use Redux state
+  const getAlert = () => {
+    if (verificationMessage && verificationSuccess) {
+      return (
+        <div
+          role="alert"
+          className="alert alert-success text-sm mb-6 bg-green-900/40 border-green-700 text-white"
+        >
+          {verificationMessage}
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div
+          role="alert"
+          className="alert alert-error text-sm mb-6 bg-red-900/40 border-red-700 text-white"
+        >
+          {error}
+        </div>
+      );
+    }
+    return null;
+  };
+
 
   return (
     <div className="min-h-screen w-screen grid place-items-center p-6 bg-linear-to-b from-black via-zinc-900 to-red-950 text-white overflow-auto">
@@ -67,24 +129,8 @@ const VerifyEmailPage = () => {
             // ENTER_OTP_FROM_EMAIL
           </p>
 
-          {message && !error && (
-            <div
-              role="alert"
-              className="alert alert-success text-sm mb-6 bg-green-900/40 border-green-700 text-white"
-            >
-              ✅ {message}
-            </div>
-          )}
-
-          {error && (
-            <div
-              role="alert"
-              className="alert alert-error text-sm mb-6 bg-red-900/40 border-red-700 text-white"
-            >
-              {error}
-            </div>
-          )}
-
+          {getAlert()} 
+          
           <div className="form-control mb-4">
             <label className="label">
               <span className="label-text text-red-400 font-mono">
@@ -97,8 +143,9 @@ const VerifyEmailPage = () => {
               placeholder="secure@mail.net"
               className="input input-bordered w-full bg-gray-900 text-white placeholder-gray-500 border-red-600 focus:border-red-400 focus:ring-1 focus:ring-red-400 font-mono"
               value={email_id}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleChange} // Use handleChange here
               required
+              readOnly={!!initialEmail} // Make it read-only if passed from register
             />
           </div>
 
@@ -114,7 +161,7 @@ const VerifyEmailPage = () => {
               placeholder="******"
               className="input input-bordered w-full bg-gray-900 text-white placeholder-gray-500 border-red-600 focus:border-red-400 focus:ring-1 focus:ring-red-400 font-mono tracking-widest text-center"
               value={otp}
-              onChange={(e) => setOtp(e.target.value)}
+              onChange={handleChange} // Use handleChange here
               maxLength="6"
               required
             />

@@ -1,13 +1,41 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-
 import axiosClient from "./utils/axiosClient";
+
+// ----------------------------------------------------------------------
+// NEW THUNKS
+// ----------------------------------------------------------------------
+
+export const verifyOtp = createAsyncThunk(
+  "auth/verifyOtp",
+  async (verificationData, { rejectWithValue }) => {
+    try {
+      // Calls the new backend endpoint for OTP verification
+      const response = await axiosClient.post(
+        "/user/verify-otp",
+        verificationData
+      );
+      // Backend returns user data and token on successful verification/login
+      return response.data; 
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message || error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+  }
+);
+
+
+// ----------------------------------------------------------------------
+// EXISTING THUNKS (NO CHANGES REQUIRED)
+// ----------------------------------------------------------------------
 
 export const adminRegister = createAsyncThunk(
   "auth/adminRegister",
   async (userData, { rejectWithValue }) => {
     try {
       const response = await axiosClient.post("user/adminRegister", userData);
-
       return response.data;
     } catch (error) {
       return rejectWithValue({
@@ -61,7 +89,9 @@ export const registerUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await axiosClient.post("/user/signup", userData);
-      return response.data.user;
+      // Returning response.data.user might be incorrect if the backend returns {message, userId}
+      // Ensure your backend returns {message, userId} and update this to return response.data
+      return response.data; 
     } catch (error) {
       return rejectWithValue({
         message: error.response?.data?.message || error.message,
@@ -92,7 +122,7 @@ export const checkAuth = createAsyncThunk(
   "auth/checkAuth",
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await axiosClient.get("/user/check"); // since we have the baseURL in axiosClient so hum full url  denge
+      const { data } = await axiosClient.get("/user/check"); 
       return data.user;
     } catch (error) {
       if (error.response?.status === 401) {
@@ -132,6 +162,11 @@ const authSlice = createSlice({
     forgotPasswordMessage: null,
     resetPasswordMessage: null,
     adminRegisterMessage: null,
+    
+    // NEW: State for OTP verification
+    isVerificationPending: false, 
+    verificationSuccess: false,   
+    verificationMessage: null,    
   },
   reducers: {
     clearAuthError: (state) => {
@@ -148,9 +183,46 @@ const authSlice = createSlice({
       state.adminRegisterMessage = null;
       state.error = null;
     },
+    
+    // NEW: Reducer to clear OTP verification state
+    clearVerificationState: (state) => {
+        state.verificationSuccess = false;
+        state.verificationMessage = null;
+        state.error = null;
+    }
   },
   extraReducers: (builder) => {
     builder
+    
+      // ----------------------------------
+      // NEW: OTP Verification Reducers
+      // ----------------------------------
+      .addCase(verifyOtp.pending, (state) => {
+        state.isVerificationPending = true;
+        state.error = null;
+        state.verificationSuccess = false;
+        state.verificationMessage = null;
+      })
+      .addCase(verifyOtp.fulfilled, (state, action) => {
+        state.isVerificationPending = false;
+        state.isAuthenticated = true; // User is verified and logged in
+        state.user = action.payload.user; // Update user state with logged-in user data
+        state.verificationSuccess = true;
+        state.verificationMessage = action.payload.message;
+        state.error = null;
+      })
+      .addCase(verifyOtp.rejected, (state, action) => {
+        state.isVerificationPending = false;
+        state.isAuthenticated = false;
+        state.user = null;
+        state.verificationSuccess = false;
+        state.verificationMessage = null;
+        state.error = action.payload?.message || "OTP verification failed.";
+      })
+      
+      // ----------------------------------
+      // EXISTING REDUCERS
+      // ----------------------------------
 
       .addCase(adminRegister.pending, (state) => {
         state.loading = true;
@@ -159,13 +231,11 @@ const authSlice = createSlice({
       })
       .addCase(adminRegister.fulfilled, (state, action) => {
         state.loading = false;
-
         state.adminRegisterMessage = action.payload;
         state.error = null;
       })
       .addCase(adminRegister.rejected, (state, action) => {
         state.loading = false;
-
         state.error = action.payload?.message || "Admin registration failed.";
         state.adminRegisterMessage = null;
       })
@@ -176,12 +246,12 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.isAuthenticated = false;
-        state.user = null;
+        // User is registered but NOT authenticated until OTP is verified
+        state.isAuthenticated = false; 
+        state.user = null; 
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
-
         state.error = action.payload?.message || "Registration failed";
         state.isAuthenticated = false;
         state.user = null;
@@ -198,7 +268,6 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-
         state.error = action.payload?.message || "Login failed";
         state.isAuthenticated = false;
         state.user = null;
@@ -215,7 +284,6 @@ const authSlice = createSlice({
       })
       .addCase(checkAuth.rejected, (state, action) => {
         state.loading = false;
-
         state.error = action.payload?.message || null;
         state.isAuthenticated = false;
         state.user = null;
@@ -234,7 +302,6 @@ const authSlice = createSlice({
       .addCase(logoutUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || "Logout failed";
-
         state.isAuthenticated = false;
         state.user = null;
       })
@@ -279,6 +346,7 @@ export const {
   clearAuthError,
   clearPasswordMessages,
   clearAdminRegisterMessage,
+  clearVerificationState, // Exporting the new reducer
 } = authSlice.actions;
 
 export default authSlice.reducer;

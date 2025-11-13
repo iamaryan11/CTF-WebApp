@@ -16,7 +16,7 @@ const Navbar = ({ menuOpen, setMenuOpen }) => (
     initial={{ y: -50, opacity: 0 }}
     animate={{ y: 0, opacity: 1 }}
     transition={{ duration: 0.5 }}
-    className="w-full bg-gray-950/80 border-b  border-red-700/40 fixed top-0 left-0 z-50 backdrop-blur-md" // Removed hover:visible
+    className="w-full bg-gray-950/80 border-b  border-red-700/40 fixed top-0 left-0 z-50 backdrop-blur-md" // Thik hai
   >
     <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
       <Timer />
@@ -118,7 +118,7 @@ export default function ChallengeDetailPage() {
     setMessage("");
 
     if (!flag.startsWith("csa_ctf{") || !flag.endsWith("}")) {
-      setMessage("⚠️ Flag must be in format csa_ctf{your_flag}");
+      setMessage("Flag must be in format csa_ctf{your_flag}");
       return;
     }
 

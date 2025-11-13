@@ -41,7 +41,7 @@ const singleQuestion = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user._id;
-    const question = await Question.findById(id).lean();
+    const question = await Question.findById(id, 'questionNumber description title  imageUrl points level  ').lean();
 
     if (!question) {
       return res.status(404).json({ message: "Question not found" });

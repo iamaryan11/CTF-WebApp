@@ -10,22 +10,34 @@ const LoginPage = () => {
   const [playSuccess] = useSound(succesSound, { volume: 1 });
   const [email_id, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  
   const { loading, error, isAuthenticated } = useSelector(
     (state) => state.auth
   );
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // ------------------------------------------------------------------
+  // CRITICAL CHANGE: Handle redirect for unverified email error
+  // ------------------------------------------------------------------
   useEffect(() => {
     if (isAuthenticated) {
       playSuccess();
       navigate("/dashboard");
     }
-  }, [isAuthenticated, navigate]);
+
+    // Check if the error is present and contains the specific unverified message
+    // Your backend sends: "Please verify your email before logging in."
+    if (error && error.message && error.message.includes("verify your email")) {
+      // Redirect the user to the verification page
+      navigate("/verifyemail", { state: { email_id } });
+    }
+  }, [isAuthenticated, navigate, error, email_id, playSuccess]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (email_id && password && !loading) {
+      // The error handling for unverified status occurs after the thunk fails
       dispatch(loginUser({ email_id, password }));
     }
   };
@@ -91,7 +103,7 @@ const LoginPage = () => {
             AUTHENTICATION REQUIRED
           </motion.p>
 
-          {error && (
+          {error && error.message && !error.message.includes("verify your email") && (
             <motion.div
               role="alert"
               className="alert alert-error text-sm mb-6 bg-red-900/40 border-red-700 text-white"
@@ -112,7 +124,8 @@ const LoginPage = () => {
                    11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <span className="wrap-break-words">{error.message || error}</span>
+              {/* Displaying error.message or the error object itself if message is missing/unstructured */}
+              <span className="wrap-break-words">{error.message || error}</span> 
             </motion.div>
           )}
 
@@ -165,7 +178,7 @@ const LoginPage = () => {
                 to="/forgot-password"
                 className="label-text-alt link link-hover text-red-500 hover:text-red-400 text-xs font-mono"
               >
-                Forgot acces key?
+                Forgot access key?
               </Link>
             </label>
           </motion.div>

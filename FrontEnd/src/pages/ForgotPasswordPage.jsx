@@ -159,7 +159,7 @@ const ForgotPasswordPage = () => {
               required
             />
             <p className="text-xs text-red-500 mt-2">
-              * We will send a verification code to this email.
+              * We will send a verification code to this email, check you spam too cause I am using free tier.
             </p>
           </motion.div>
 

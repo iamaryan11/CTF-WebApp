@@ -28,37 +28,33 @@ export const fetchChallenges = createAsyncThunk(
   }
 );
 
-
 export const solveChallenge = createAsyncThunk(
-  "questions/solveChallenge",
-  async ({ id, submittedFlag }, thunkAPI) => {
+    "questions/solveChallenge",
+    async ({ id, submittedFlag }, thunkAPI) => {
+        try {
 
-    try {
-      await delay(1000); 
-      const state = thunkAPI.getState();
-      const challenge = state.questions.challenges.find(
-        (c) => c.questionNumber === id
-      );
+            const res = await axiosClient.post(`/submit-flag/${id}`, { submittedFlag }); 
 
 
-      if (challenge && submittedFlag === challenge.flag) {
+            if (res.data.success) {
+                return {
+                    questionNumber: id,
 
-        return {
-          questionNumber: challenge.questionNumber,
-          points: challenge.points,
-        };
-      } else {
+                    points: res.data.newScore, 
+                };
+            } else {
 
-        return thunkAPI.rejectWithValue({
-          message: "INCORRECT FLAG: Access denied. Try again.",
-        });
-      }
-    } catch (error) {
-      return thunkAPI.rejectWithValue({
-        message: error.message || "Submission failed.",
-      });
+                return thunkAPI.rejectWithValue({
+                    message: res.data.message || "INCORRECT FLAG: Try again.",
+                });
+            }
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue({
+                message: error.response?.data?.message || "Submission failed.",
+            });
+        }
     }
-  }
 );
 
 

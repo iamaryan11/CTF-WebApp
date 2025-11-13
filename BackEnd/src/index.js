@@ -1,5 +1,9 @@
+const dotenv = require("dotenv");
+dotenv.config();
 const express = require("express");
 const app = express();
+const helmet=require("helmet");
+const ratelimit=require('express-rate-limit');
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const master = require("./config/db");
@@ -11,8 +15,9 @@ const leaderRoute = require("./routes/leaderRoutes");
 const router = require("./routes/flagRoutes");
 const eventTimerRoute = require("./routes/eventTimerRoute");
 
-const dotenv = require("dotenv");
-dotenv.config();
+
+// const dotenv = require("dotenv");
+// dotenv.config();
 
 app.use(
   cors({
@@ -21,15 +26,50 @@ app.use(
     credentials: true,
   })
 );
+app.use(helmet());
+const ratelimiter=ratelimit({
+  windowMs:10*60*1000,
+  max:10,
+  message:{
+    success:false,
+    message:"dont mess with the application count your requests aisa mt kr bhai :("
+  },
+  standardHeaders:true,
+  legacyHeaders:false,
+  // keyGenerator:(req)=>
+  //   req.body?.email_id||req.ip,
+ipv6Subnet: 56,
+
+})
+
+app.get("/", (req, res) => {
+  res.status(200).send("Server utha hua hai.");
+});
+
+
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api/event-time", eventTimerRoute);
 
-app.use("/user", authRouter);
+app.use("/user", ratelimiter,authRouter);
 app.use("/letadmincook", adminRight);
 app.use("/api", flagRoutes);
 app.use("/see", leaderRoute);
 app.use("/user", router);
+
+
+
+const fullapplimiter=
+ratelimit({
+  windowMs:15*60*1000, //--> 15minutes
+  max:100,
+  message:{
+    message:{message:"guess you are messing up with the application hitting the same endpoint again and again, come back later ;)"}
+  }
+})
+app.use(fullapplimiter)
+
+
 
 const InitializeConnection = async () => {
   try {

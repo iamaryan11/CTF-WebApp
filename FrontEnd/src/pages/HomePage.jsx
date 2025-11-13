@@ -272,18 +272,18 @@ function HomePage() {
               </div>
 
               <div className="flex flex-col sm:flex-row justify-center items-center sm:space-x-4 space-y-3 sm:space-y-0">
-                <button
+                {/* <button
                   className="text-red-700 bg-gray-950/50 border border-red-800/40 btn btn-md sm:btn-lg btn-secondary shadow-lg hover:shadow-red-500/90 transition-all duration-300  font-orbi tracking-widest w-3/4 sm:w-auto"
                   onClick={() => navigate("/register")}
                 >
                   Probe( )
-                </button>
+                </button> */}
 
                 <button
                   className="text-red-700 bg-gray-950/50  border-red-800/40 btn btn-md sm:btn-lg btn-secondary shadow-lg hover:shadow-red-500/90 transition-all duration-300 font-orbi tracking-widest w-3/4 sm:w-auto"
                   onClick={() => navigate("/protocol")}
                 >
-                  Protocol
+                  Read Protocol
                 </button>
               </div>
             </div>

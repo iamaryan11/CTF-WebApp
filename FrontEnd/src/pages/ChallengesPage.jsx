@@ -164,26 +164,24 @@ const ChallengesPage = () => {
                 className="card bg-gray-950/50 border border-red-700/40 shadow-lg shadow-red-900/30 p-2 rounded-2xl hover:border-red-500 hover:shadow-red-800/40 transition-all duration-300 cursor-pointer"
                 onClick={() => navigate(`/challenge/${q._id}`)}
               >
-                {/* ✨ Solved Badge Implementation (using q.isSolved) */}
+
                 {q.isSolved && (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 200 }}
-                    className="absolute top-3 right-3 z-20 flex items-center space-x-1 bg-gray-300 text-green-950 text-sm font-bold px-3 py-1 rounded-full shadow-lg shadow-white-700/50"
+                    className="absolute top-3 right-3 z-20 flex items-center space-x-1 bg-green-950 text-red-400 text-sm font-bold px-3 py-1 rounded-full shadow-lg shadow-white-700/50"
                   >
                     <CheckCircle size={15} />
                     {/* <span>Solved</span> */}
                   </motion.div>
                 )}
-                {/* End Solved Badge */}
+
                 <div className="card-body text-center">
                   <h3 className="text-2xl text-red-500 font-semibold mb-2 tracking-widest">
                     {q.title}
                   </h3>
-                  <p className="tracking-widest mb-2 text-gray-300">
-                    {q.description}
-                  </p>
+                  
                   <p className="text-sm text-gray-300 font-semibold tracking-widest">
                     Points: {q.points || "N/A"}
                   </p>

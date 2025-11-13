@@ -96,12 +96,12 @@ const Footer = () => {
           className="link link-hover text-gray-400 font-orbi tracking-widest hover:text-red-500 transition-colors"
           to="/letsysopcookhere"
         ></Link>
-        <Link
+        {/* <Link
           className="link link-hover text-gray-400 font-orbi tracking-widest hover:text-red-500 transition-colors"
           to="/dev"
         >
           About_dev
-        </Link>
+        </Link> */}
       </nav>
 
       <nav className="flex flex-col space-y-2">
@@ -134,7 +134,7 @@ const Footer = () => {
             <span className="text-sm font-orbi tracking-widest">GitHub</span>
           </a>
           <a
-            href="https://www.instagram.com/csa.juit?igsh=MTE1Mmphc2lic3o5cw=="
+           href="https://www.instagram.com/aryaxn_03/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-400 hover:text-red-500 transition-colors flex items-center space-x-2"
@@ -159,33 +159,9 @@ const Footer = () => {
             <span className="text-sm font-orbi tracking-widest">Instagram</span>
           </a>
 
+           
           <a
-            href=" https://x.com/RajKartavya_047?t=sYmSRjwhk52xc-VQYw8tYQ&s=08"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-400 hover:text-red-500 transition-colors flex items-center space-x-2"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="icon icon-tabler icons-tabler-outline icon-tabler-brand-x"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-              <path d="M4 4l11.733 16h4.267l-11.733 -16z" />
-              <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" />
-            </svg>
-            <span className="text-sm font-orbi tracking-widest">Twitter</span>
-          </a>
-
-          <a
-            href="https://www.linkedin.com/company/cyber-security-allaince-juit/"
+          href="https://www.linkedin.com/in/aryan-3b4021330/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-400 hover:text-red-500 transition-colors flex items-center space-x-2"

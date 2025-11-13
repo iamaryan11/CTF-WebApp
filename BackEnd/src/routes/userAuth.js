@@ -1,4 +1,8 @@
 const express = require("express");
+const app = express();
+const ratelimit=require('express-rate-limit');
+const helmet=require("helmet");
+
 const {
   signup,
   login,
@@ -15,13 +19,30 @@ const { userMiddleware } = require("../middleware/userMiddleware");
 const { adminMiddleware } = require("../middleware/adminMiddleware");
 
 const Question = require("../model/question");
+app.use(helmet());
 
+const ratelimiter=ratelimit({
+  windowMs:10*60*1000,
+  max:10,
+  message:{
+    success:false,
+    message:"dont mess with the application, count your requests you are hitting the same endpoint again again :("
+  },
+  standardHeaders:true,
+  legacyHeaders:false,
+  // keyGenerator:(req)=>
+  //   req.body?.email_id||req.ip,
+ipv6Subnet: 56,
+
+})
 const authRouter = express.Router();
-authRouter.post("/signup", signup);
-authRouter.post("/verify-otp", verifyOtp);
-authRouter.post("/resend-otp", resendOtp);
-authRouter.post("/forgot-password", userMiddleware, forgotPassword);
-authRouter.post("/reset-password", userMiddleware, resetPassword);
+authRouter.post("/signup", ratelimiter,signup);
+authRouter.post("/verify-otp",ratelimiter, verifyOtp);
+authRouter.post("/resend-otp", ratelimiter,resendOtp);
+authRouter.post("/forgot-password",ratelimiter,  forgotPassword); //--> userMiddleware hta dia maine
+authRouter.post("/reset-password", ratelimiter,resetPassword);//--> same hree
+// authRouter.post("/forgot-password", userMiddleware, forgotPassword); //--> userMiddleware hta dia maine
+// authRouter.post("/reset-password", userMiddleware, resetPassword);//--> same hree
 authRouter.post("/login", login);
 authRouter.post("/logout", userMiddleware, logout);
 authRouter.post("/adminRegister", adminMiddleware, adminRegister);
@@ -55,7 +76,7 @@ authRouter.get("/check", userMiddleware, async (req, res) => {
 
 authRouter.get("/question/:id", userMiddleware, async (req, res) => {
   try {
-    const question = await Question.findById(req.params.id);
+    const question = await Question.findById(req.params.id).select("-flag");
     res.status(200).json({ question });
   } catch (error) {
     res.status(404).json({ message: "Challenge not found" });
