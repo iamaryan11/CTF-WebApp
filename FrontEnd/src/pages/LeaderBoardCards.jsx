@@ -18,7 +18,7 @@ const LeaderBoardCards = () => {
       if (!isAuto) setLoading(true);
       else setRefreshing(true);
 
-      const res = await axios.get("http://localhost:1111/see/leaderboard");
+      const res = await axios.get("https://ctf-webapp-w65c.onrender.com/see/leaderboard");
       if (res.data.success) setLeaderboard(res.data.leaderboard);
     } catch (error) {
       console.error("Error fetching leaderboard:", error);
