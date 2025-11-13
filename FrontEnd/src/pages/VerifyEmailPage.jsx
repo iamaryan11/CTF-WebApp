@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux"; // 1. IMPORT REDUX HOOKS
-import { useNavigate, useLocation } from "react-router-dom"; // 2. IMPORT useLocation
-import { verifyOtp, clearVerificationState } from "../authSlice"; // 3. IMPORT THE THUNK AND CLEAR REDUCER
+import { useDispatch, useSelector } from "react-redux"; 
+import { useNavigate, useLocation } from "react-router-dom"; 
+import { verifyOtp, clearVerificationState } from "../authSlice"; 
 import Loader from "../components/Loader";
 
 const VerifyEmailPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const location = useLocation(); // Get location state
+  const location = useLocation(); 
 
-  // Get email_id passed from RegisterPage, if available
+
   const initialEmail = location.state?.email_id || "";
 
-  // 4. USE REDUX STATE for loading, error, and messages
+
   const {
-    isVerificationPending: loading, // Use the specific loading state
+    isVerificationPending: loading, 
     error,
     verificationMessage,
     verificationSuccess,
@@ -28,24 +28,21 @@ const VerifyEmailPage = () => {
 
   const { email_id, otp } = formData;
 
-  // 5. useEffect to clear state on mount and handle success/redirect
+  
   useEffect(() => {
-    // Clear any previous verification messages/errors when mounting
+
     dispatch(clearVerificationState());
   }, [dispatch]);
 
   useEffect(() => {
     if (verificationSuccess && isAuthenticated) {
-        // Verification was successful and user is logged in (as per backend response)
+
         setTimeout(() => {
-            navigate("/dashboard"); // Redirect to the main authenticated area
+            navigate("/dashboard"); 
         }, 1500);
     }
-    // If the error property is set by the thunk, the UI will display it automatically.
-    // Ensure that if the user somehow navigates here while already authenticated
     if (isAuthenticated && !verificationSuccess) {
-      // Small defensive check
-      // navigate("/dashboard"); 
+  
     }
   }, [verificationSuccess, isAuthenticated, navigate]);
 
@@ -61,20 +58,20 @@ const VerifyEmailPage = () => {
     e.preventDefault();
     if (!email_id || !otp || loading) return;
 
-    // Clear previous error messages before dispatching
+
     dispatch(clearVerificationState()); 
 
     try {
-        // 6. USE REDUX THUNK INSTEAD OF fetch()
+
         await dispatch(verifyOtp(formData)).unwrap();
-        // Success handled by the useEffect watching verificationSuccess
+
     } catch (err) {
-        // Errors handled by the Redux state ('error')
+
         console.error("OTP verification failed:", err);
     }
   };
 
-  // 7. Update the Alert logic to use Redux state
+
   const getAlert = () => {
     if (verificationMessage && verificationSuccess) {
       return (
@@ -143,9 +140,9 @@ const VerifyEmailPage = () => {
               placeholder="secure@mail.net"
               className="input input-bordered w-full bg-gray-900 text-white placeholder-gray-500 border-red-600 focus:border-red-400 focus:ring-1 focus:ring-red-400 font-mono"
               value={email_id}
-              onChange={handleChange} // Use handleChange here
+              onChange={handleChange} 
               required
-              readOnly={!!initialEmail} // Make it read-only if passed from register
+              readOnly={!!initialEmail} 
             />
           </div>
 
@@ -161,7 +158,7 @@ const VerifyEmailPage = () => {
               placeholder="******"
               className="input input-bordered w-full bg-gray-900 text-white placeholder-gray-500 border-red-600 focus:border-red-400 focus:ring-1 focus:ring-red-400 font-mono tracking-widest text-center"
               value={otp}
-              onChange={handleChange} // Use handleChange here
+              onChange={handleChange} 
               maxLength="6"
               required
             />
