@@ -7,7 +7,7 @@ const Fetchlimter=()=>{
     useEffect(()=>{
         const fetchmessage=async()=>{
             try{
-                const res=await axios.get("http://localhost:1111/user/check",{
+                const res=await axios.get("https://ctf-webapp-w65c.onrender.com/user/check",{
                     withCredentials:true,
                 });
                 setMess(res.data.message);
